@@ -6,6 +6,10 @@ def determine_format_specifications(state: State):
     format_specifications = FORMAT_SPECIFICATIONS.get(target_format, DEFAULT_FORMAT_SPECIFICATIONS)
 
     print(f"Format determination complete for {target_format}")
-    print(format_specifications)
+    # print(format_specifications)
 
-    return state | {"format_specifications": format_specifications}
+    # TODO: Do we need history?
+    # state["format_specifications"] = state.get("format_specifications", []) + [format_specifications]
+    state["format_specifications"] = format_specifications
+
+    return state 

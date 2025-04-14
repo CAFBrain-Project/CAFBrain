@@ -6,9 +6,10 @@ from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+from langchain_core.messages import AIMessage
 
 load_dotenv()
-contente_generator = ChatOpenAI(model = "gpt-4o-mini", temperature = 0, api_key = os.getenv("OPENAI_API_KEY")) # TODO: Move it to models dir
+content_generator = ChatOpenAI(model = "gpt-4o-mini", temperature = 0, api_key = os.getenv("OPENAI_API_KEY")) # TODO: Move it to models dir
 
 def construct_generation_prompt(target_format):
     template = CONTENT_GENERATION_BASE_TEMPLATE
@@ -34,7 +35,7 @@ def generate_content(state: State):
     prompt = construct_generation_prompt(target_format)
     chain = (
         prompt
-        | contente_generator
+        | content_generator
         | StrOutputParser()
     )
 
@@ -45,9 +46,7 @@ def generate_content(state: State):
     })
 
     print("Content Generated")
-    print(generated_content)
-    print("Generation END")
-    print(len(generated_content))
 
-    # TODO: Don't we need to wrap around AIMessage?
-    return state | {"messages": [generated_content]}
+    state["generated_content"] = state.get("generated_content", []) + [AIMessage(content = generated_content)]
+
+    return state

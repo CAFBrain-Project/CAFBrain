@@ -12,8 +12,6 @@ from langchain.docstore.document import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 
-ocr = OCR()
-image_caption = ImageCaption()
 text_splitter = RecursiveCharacterTextSplitter(chunk_size = 500, chunk_overlap = 50)
 
 
@@ -21,6 +19,7 @@ def process_image(image_path: str, file_type = "image", **kwargs):
     documents = []
     
     # OCR
+    ocr = OCR()
     ocr_result = ocr.forward(image_path)
     documents.extend([
         Document(
@@ -35,6 +34,7 @@ def process_image(image_path: str, file_type = "image", **kwargs):
     ])
 
     # Image Captioning
+    image_caption = ImageCaption()
     image_caption_result = image_caption.forward(image_path)
     documents.extend([
         Document(
@@ -73,19 +73,18 @@ def process_pdf(pdf_path: str):
             ) for chunk in text_splitter.split_text(text)
         ])
 
-        images = []
-        for img_index, img in enumerate(image_list):
-            xref = img[0]  # Xref is the reference to the image
-            base_image = doc.extract_image(xref)
-            img_bytes = base_image["image"]  # Image as byte data
-            img_ext = base_image["ext"]
+        # for img_index, img in enumerate(image_list):
+        #     xref = img[0]  # Xref is the reference to the image
+        #     base_image = doc.extract_image(xref)
+        #     img_bytes = base_image["image"]  # Image as byte data
+        #     img_ext = base_image["ext"]
             
-            img = PILImage.open(io.BytesIO(img_bytes))
-            image_path = save_img(img, img_ext)
+        #     img = PILImage.open(io.BytesIO(img_bytes))
+        #     image_path = save_img(img, img_ext)
 
-            txt, docs = process_image(image_path, file_type = "PDF", page_num = page_num)
-            text += "\n" + txt
-            documents.extend(docs)
+        #     txt, docs = process_image(image_path, file_type = "PDF", page_num = page_num)
+        #     text += "\n" + txt
+        #     documents.extend(docs)
 
         extracted_text += text + "\n"
     
@@ -105,17 +104,17 @@ def process_ppt(ppt_path: str):
             if hasattr(shape, "text"):
                 text.append(shape.text)
                 
-            elif hasattr(shape, "image"):
-                image = shape.image
-                img_bytes = image.blob
-                img_ext = image.ext
-                images.append(img_bytes)
+            # elif hasattr(shape, "image"):
+            #     image = shape.image
+            #     img_bytes = image.blob
+            #     img_ext = image.ext
+            #     images.append(img_bytes)
 
-                img = PILImage.open(io.BytesIO(img_bytes))
-                image_path = save_img(img, img_ext)
+            #     img = PILImage.open(io.BytesIO(img_bytes))
+            #     image_path = save_img(img, img_ext)
 
-                txt, _ = process_image(image_path)
-                text.append(txt)
+            #     txt, _ = process_image(image_path)
+            #     text.append(txt)
 
         extracted_text += "\n".join(text) + "\n"
         documents.extend([
@@ -152,13 +151,12 @@ def process_text(text_file_path: str):
 def process_sources(state: State):
     extracted_texts = state.get("extracted_texts", [])
     documents = state.get("documents", [])
-    prev_doc_count = state.get("prev_doc_count", 0)
+    processed_doc_count = state.get("processed_doc_count", 0)
     source_file_paths = state.get("source_file_paths", [])
 
-    # print('To check if processing updated:', len(source_file_paths), prev_doc_count)
-
-    for file_path in source_file_paths[prev_doc_count:]:
+    for file_path in source_file_paths[processed_doc_count : ]:
         file_extension = (file_path.split('.')[-1]).lower()
+
         if file_extension in ["png", "jpg", "jpeg"]:
             text, docs = process_image(image_path = file_path)
 
@@ -172,8 +170,11 @@ def process_sources(state: State):
             text, docs = process_ppt(ppt_path = file_path)
 
         extracted_texts.append(text)
-        documents.extend(docs)
+        documents.append(docs)
 
     print("Processed sources")
+
+    state["extracted_texts"] = extracted_texts
+    state["documents"] = documents
     
-    return state | {"extracted_texts": extracted_texts, "documents": documents}
+    return state

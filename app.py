@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from agent.graph import graph
 from agent.state import State
 
-from langchain.docstore.document import Document
+# from langchain.docstore.document import Document
 from langchain_core.messages import HumanMessage
 
 UPLOAD_DIR = "uploads"
@@ -62,6 +62,9 @@ with col1:
     else:
         st.write("Selected format: " + st.session_state.file_format)
 
+    # img = st.session_state.graph.get_graph().draw_png()
+    # st.image(img)
+
     if user_input != None:
         st.session_state.user_input = user_input
 
@@ -87,40 +90,65 @@ with col1:
                 f.write(file.getbuffer())
             
             file_paths.append(file_path)
-            
-            # print(file.keys())
-#         [UploadedFile(file_id='5a8bd2c9-9b5b-43af-8669-eb48d743d39a', name='001_01.12.23 CAFB & Feeding America Meeting.pptx', type='application/vnd.openxmlformats-officedocument.presentationml.presentation', size=10764969, _file_urls=file_id: "5a8bd2c9-9b5b-43af-8669-eb48d743d39a"
-# upload_url: "/_stcore/upload_file/1dbeafec-408a-4098-8254-de4add452609/5a8bd2c9-9b5b-43af-8669-eb48d743d39a"
-# delete_url: "/_stcore/upload_file/1dbeafec-408a-4098-8254-de4add452609/5a8bd2c9-9b5b-43af-8669-eb48d743d39a"
-# ), UploadedFile(file_id='4c1aa65f-fa90-437f-8114-335cafcf0a30', name='002_2024 CAFB Strategy Refresh_external.pptx', type='application/vnd.openxmlformats-officedocument.presentationml.presentation', size=7297229, _file_urls=file_id: "4c1aa65f-fa90-437f-8114-335cafcf0a30"
-# upload_url: "/_stcore/upload_file/1dbeafec-408a-4098-8254-de4add452609/4c1aa65f-fa90-437f-8114-335cafcf0a30"
-# delete_url: "/_stcore/upload_file/1dbeafec-408a-4098-8254-de4add452609/4c1aa65f-fa90-437f-8114-335cafcf0a30"
-# )]
-
 
         st.session_state.chat_history.append(("Human", query))
+
+        query = HumanMessage(content = query)
         if not state:
             state["messages"] = [query]
-            state["prev_doc_count"] = 0
             state["source_file_paths"] = file_paths
             state["target_format"] = st.session_state.file_format
         else:
             state["messages"].append(query)
+            state["source_file_paths"].extend(file_paths)
         
-        print(state)
+        conversation = [{"sender": sender,  "message": message} for sender, message in st.session_state.chat_history]
+        # CSS for styling the messages
+        st.markdown("""
+            <style>
+            .chat-container {
+                max-width: 700px;
+                margin: 0 auto;
+                padding: 1rem;
+            }
+            .human {
+                background-color: #DCF8C6;
+                padding: 0.8rem;
+                border-radius: 10px;
+                margin-bottom: 0.5rem;
+                align-self: flex-end;
+                text-align: right;
+            }
+            .ai {
+                background-color: #F1F0F0;
+                padding: 0.8rem;
+                border-radius: 10px;
+                margin-bottom: 0.5rem;
+                align-self: flex-start;
+                text-align: left;
+            }
+            .message-block {
+                display: flex;
+                flex-direction: column;
+                margin-bottom: 1rem;
+            }
+            </style>
+        """, unsafe_allow_html = True)
+
+        # Conversation container
+        st.markdown('<div class="chat-container">', unsafe_allow_html = True)
+        for msg in conversation:
+            css_class = "human" if msg["sender"].lower() == "human" else "ai"
+            st.markdown(f'<div class="message-block"><div class="{css_class}">{msg["message"]}</div></div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
         with st.spinner("Thinking..."):
             st.session_state.graph_state = graph.invoke(state)
-            st.session_state.chat_history.append(("AI", st.session_state.graph_state["messages"][-1].content))
-        
-        print(len(st.session_state.chat_history[-1][1]))
 
-    # for role, msg in st.session_state.chat_history[-6:]:
-    #     st.markdown(f"**{role}**: {msg}")
+            # print(st.session_state.graph_state)
+            st.session_state.chat_history.append(("AI", st.session_state.graph_state["messages"][-1].content))
 
 with col2:
-    # print("\n".join([a + ": " + b for a, b in st.session_state.chat_history]))
-
     # st.header("")
     st.markdown("""
     <style>
@@ -147,9 +175,9 @@ with col2:
     </style>
     """, unsafe_allow_html = True)
     
-    ai_messages = list(filter(lambda x: x[0] == "AI", st.session_state.chat_history))
+    ai_messages = st.session_state.graph_state.get("generated_content", [])
     if len(ai_messages):
-        value = ai_messages[-1][1]
+        value = ai_messages[-1].content
     else:
         value = ""
 
@@ -162,7 +190,6 @@ with col2:
         buffer = BytesIO()
         
         file_format = st.session_state.file_format
-        print("Processing")
         if file_format in ["Blog Post"]:
             filename = f"content.txt"
             buffer.write(processed_content.encode())

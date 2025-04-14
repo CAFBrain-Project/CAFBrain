@@ -16,19 +16,13 @@ def analyze_documents(state: State):
                     # "Program Impacts", "Client Stories", "Funding Requirements", "Barriers Identified", "Food Medicine Leadership"       # Optional
                 ]
 
-    prev_doc_count = state.get("prev_doc_count", 0)
-    for index, text in enumerate(state["extracted_texts"]):
-        if(index < prev_doc_count):
-            print('Skipping analysing previous documents')
-            continue
-        
+    processed_doc_count = state.get("processed_doc_count", 0)
+    for text in state["extracted_texts"][processed_doc_count : ]:
         content_details = dict()
 
         for extraction_type in extraction_types:
             category_prompt = EXTRACTION_CATEGORY_TEMPLATES.get(extraction_type, DEFAULT_EXTRACTION_TEMPLATE.replace("{extraction_type}", extraction_type))
             prompt = ChatPromptTemplate.from_template(CAFB_TEMPLATE + category_prompt)
-
-            print('This is the prompt of doc_analyzer:', prompt)
     
             chain = (
                 prompt
@@ -38,10 +32,10 @@ def analyze_documents(state: State):
     
             content_details[extraction_type] = chain.invoke({"text": text})
     
-        extracted_content_details.extend(content_details)
-        print()
+        extracted_content_details.append(content_details)
 
     print("Analyzed Documents")
 
-    # TODO: Don't we have to add pipe operator here?
-    return {"extracted_content_details": extracted_content_details}
+    state["extracted_content_details"] = extracted_content_details
+
+    return state
