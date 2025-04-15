@@ -101,52 +101,52 @@ with col1:
         else:
             state["messages"].append(query)
             state["source_file_paths"].extend(file_paths)
-        
-        conversation = [{"sender": sender,  "message": message} for sender, message in st.session_state.chat_history]
-        # CSS for styling the messages
-        st.markdown("""
-            <style>
-            .chat-container {
-                max-width: 700px;
-                margin: 0 auto;
-                padding: 1rem;
-            }
-            .human {
-                background-color: #DCF8C6;
-                padding: 0.8rem;
-                border-radius: 10px;
-                margin-bottom: 0.5rem;
-                align-self: flex-end;
-                text-align: right;
-            }
-            .ai {
-                background-color: #F1F0F0;
-                padding: 0.8rem;
-                border-radius: 10px;
-                margin-bottom: 0.5rem;
-                align-self: flex-start;
-                text-align: left;
-            }
-            .message-block {
-                display: flex;
-                flex-direction: column;
-                margin-bottom: 1rem;
-            }
-            </style>
-        """, unsafe_allow_html = True)
-
-        # Conversation container
-        st.markdown('<div class="chat-container">', unsafe_allow_html = True)
-        for msg in conversation:
-            css_class = "human" if msg["sender"].lower() == "human" else "ai"
-            st.markdown(f'<div class="message-block"><div class="{css_class}">{msg["message"]}</div></div>', unsafe_allow_html=True)
-        st.markdown('</div>', unsafe_allow_html=True)
 
         with st.spinner("Thinking..."):
             st.session_state.graph_state = graph.invoke(state)
 
             # print(st.session_state.graph_state)
             st.session_state.chat_history.append(("AI", st.session_state.graph_state["messages"][-1].content))
+
+    conversation = [{"sender": sender,  "message": message} for sender, message in st.session_state.chat_history]
+    # CSS for styling the messages
+    st.markdown("""
+        <style>
+        .chat-container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        .human {
+            background-color: #DCF8C6;
+            padding: 0.8rem;
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+            align-self: flex-end;
+            text-align: right;
+        }
+        .ai {
+            background-color: #F1F0F0;
+            padding: 0.8rem;
+            border-radius: 10px;
+            margin-bottom: 0.5rem;
+            align-self: flex-start;
+            text-align: left;
+        }
+        .message-block {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 1rem;
+        }
+        </style>
+    """, unsafe_allow_html = True)
+
+    # Conversation container
+    st.markdown('<div class="chat-container">', unsafe_allow_html = True)
+    for msg in conversation:
+        css_class = "human" if msg["sender"].lower() == "human" else "ai"
+        st.markdown(f'<div class="message-block"><div class="{css_class}">{msg["message"]}</div></div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 with col2:
     # st.header("")

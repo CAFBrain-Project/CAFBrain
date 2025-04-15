@@ -13,3 +13,6 @@ agent/models/weights
 
 uploads/
 temp/
+Dataset/
+FAISS/
+Models/

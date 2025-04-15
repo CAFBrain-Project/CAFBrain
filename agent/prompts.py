@@ -16,95 +16,33 @@ TEXT:
 1.
 """
 
-EXTRACTION_CATEGORY_TEMPLATES = {
-    "Key Points": """
-        Extract all important points from the following text for CAFB program.
-        Format your response as a numbered list of distinct important points.
-        Each point should be a complete sentence or phrase capturing a single important idea.
-        Focus on information about food insecurity, programs, initiatives, and impact.
-        Include only factual information present in the text, not inferences.
+EXTRACTION_CATEGORY_TEMPLATE = """You are a specialized content extraction assistant for the Capital Area Food Bank (CAFB).
+    Your task is to carefully analyze text and extract specific information based on the request.
+    Always provide your response as a numbered list of distinct items **for each category**.
+    Do not generate information not present in the original text.
+    Focus on information relevant to CAFB's mission of addressing food insecurity.
 
-        TEXT:
-        {text}
+    Extract the following categories of information from the text:
+    {extraction_categories}
 
-        KEY POINTS:
-    """,
+    For each category, provide a clear heading, followed by a numbered list of distinct items.
+    If no information is available for a category, write "No relevant information found."
 
-    "Quotes": """
-        Extract all direct quotes from the following text.
-        Format each quote as a separate list item with attribution if available.
-        Ensure quotes are exact and enclosed in quotation marks.
-        Include who said the quote if mentioned in the text.
-        For quotes from Capital Area Food Bank (CAFB) clients or stakeholders, note their relationship to CAFB.
+    TEXT:
+    {text}
 
-        TEXT:
-        {text}
+    Respond in the following format:
 
-        QUOTES:
-    """,
+    # {category_1}
+    1.
+    2.
 
-    "Statistics": """Extract all numerical data, statistics, and metrics from the following text about CAFB program.
-        Format your response as a numbered list where each item contains:
-        - The specific statistic or measurement
-        - Context or meaning of the statistic
-        - Time period or date if mentioned
-        - Source of the statistic if available
+    # {category_2}
+    1.
+    2.
 
-        Focus on statistics related to food insecurity, program impact, funding, or client demographics.
-        Convert all written numbers to numerals (e.g., "three million" to "3 million").
-
-        TEXT:
-        {text}
-
-        STATISTICS:
-    """,
-
-    "Program Impacts": """
-        Extract all information about CAFB program impacts and outcomes from the text.
-        Format as a numbered list with each item containing:
-        - The specific program or initiative name
-        - The impact or outcome described
-        - Population served or benefiting
-        - Time frame if mentioned
-
-        Include both quantitative impacts (numbers) and qualitative impacts (descriptions).
-
-        TEXT:
-        {text}
-
-        PROGRAM IMPACTS:
-    """,
-
-    "Food Medicine Leadership": """
-        Extract all information about CAFB's role and leadership in food as medicine initiatives.
-        Format as a numbered list capturing:
-        - Specific food as medicine programs or initiatives
-        - Partnerships with healthcare organizations
-        - Innovation in connecting nutrition to health outcomes
-        - Evidence of CAFB's leadership in this space
-        - Impact of these initiatives
-
-        TEXT:
-        {text}
-
-        FOOD MEDICINE LEADERSHIP:
-    """,
-
-    "Barriers Identified": """
-        Extract all information about barriers CAFB program clients face in accessing SNAP and food assistance.
-        Format as a numbered list where each item:
-        - Identifies a specific barrier
-        - Describes how it impacts clients
-        - Mentions any solutions CAFB is implementing to address it
-
-        This information is particularly important for Example 2 in the CAFB challenge.
-
-        TEXT:
-        {text}
-
-        BARRIERS IDENTIFIED:
-    """
-}
+    ...and so on for each category.
+"""
 
 CONTENT_GENERATION_BASE_TEMPLATE = """You are an AI assistant for the Capital Area Food Bank (CAFB), supporting the creation of impactful written content that aligns with CAFB’s mission to combat food insecurity. 
 Your task is to generate high-quality {target_format} content based on the details provided below.
@@ -212,10 +150,10 @@ If you have previously generated an artifact and the user asks a question that s
 
 Here are some examples on you should respond:
 <example id=1>
-Route: Rewrite
+Route: Refine
 </example>
 <example id=2>
-Route: Reply To General Input
+Route: Query
 </example>
 <example id=3>
 Route: Generate

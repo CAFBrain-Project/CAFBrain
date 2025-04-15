@@ -21,11 +21,12 @@ def query(state: State):
 
     answer = chain.invoke({
         "conversation": conversation[:-1],
-        "query": conversation[-1],
+        "user_query": conversation[-1],
         "retrieved_content": retrieved_content
     })
 
     print("Query")
+    print(answer)
 
     state["processed_doc_count"] = len(state["source_file_paths"])
     state["messages"].append(AIMessage(content = answer))
