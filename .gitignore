@@ -9,6 +9,8 @@ env/
 venv/
 *.env
 
+flask_app.py
+
 agent/models/weights
 
 uploads/

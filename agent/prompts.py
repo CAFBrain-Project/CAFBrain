@@ -70,7 +70,8 @@ GRANT_PROPOSAL_TEMPLATE = """Content Requirements:
 - Highlight CAFB’s leadership in food medicine and partnerships
 - Use CAFB brand voice: mission-focused, inclusive, and solution-oriented
 
-Output Format (Python dictionary style):
+ONLY respond with valid JSON using THIS EXACT STRUCTURE:
+```json
 [
     {{"heading": "Cover Page", "content": "Title:...\nOrganization:...\nDate:...\nContact:..."}},
     {{"heading": "Executive Summary", "content": "This proposal outlines..."}},
@@ -83,7 +84,8 @@ BLOG_POST_TEMPLATE = """Write in a conversational tone, suitable for a general a
 Include personal stories or quotes from food-insecure neighbors if available.
 Highlight the barriers clients face in accessing SNAP and CAFB's efforts to reduce these barriers.
 
-Output Format (Python dictionary):
+ONLY respond with valid JSON using THIS EXACT STRUCTURE:
+```json
 {{
   "headline": "Blog Post Title",
   "introduction": "Opening paragraph(s)...",
@@ -101,7 +103,8 @@ PRESENTATION_TEMPLATE = """Structure the content in bullet points, suitable for 
 Focus on key statistics, impactful visuals, and concise messaging.
 Include a clear call-to-action for the audience.
 
-Output format (in JSON-like Python dictionary format):
+ONLY respond with valid JSON using THIS EXACT STRUCTURE:
+```json
 [
     {{"title": "Slide Title", "subtitle": "Optional for first slide only"}},
     {{"title": "Slide Title", "bullets": ["Point 1", "Point 2", "Point 3..."]}},
@@ -271,3 +274,30 @@ Finally, here is the chat history between you and the user
 </conversation>
 
 This message should be short and to the point. Do not include any tags, prefixes, or extra text before or after the response. Output only the follow-up message."""
+
+# QUERY_ANALYSIS_TEMPLATE = """You are an intelligent assistant designed to generate or modify content based on user prompts and specific format requirements.
+
+# ## Target Format
+# {target_format}
+
+# ## Format Specifications
+# {format_specifications}
+
+# ## User Prompt
+# {user_prompt}
+
+# ## Instructions:
+# 1. First, determine the intent of the user:
+#    - If the prompt is a general query or small-talk, answer it directly without generating or modifying any content.
+#    - If the prompt asks for content generation or changes to existing content, proceed to step 2.
+
+# 2. If content generation is requested:
+#    - Follow the format specifications strictly unless the prompt suggests modifications.
+#    - Apply any implied or explicit changes based on the user’s request (e.g., tone, length, audience, style).
+
+# 3. Output content in structured format:
+#    - For presentations: Use sections, slides, titles, and bullet points.
+#    - For blog posts: Use headings, paragraphs, and markdown formatting.
+#    - For grant proposals: Use formal sections like "Abstract", "Background", "Methodology", etc.
+
+# 4. Clearly separate your reasoning (if needed) from the final output using:"""

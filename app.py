@@ -5,8 +5,8 @@ from dotenv import load_dotenv
 
 from agent.graph import graph
 from agent.state import State
+from agent.utils import json_to_blog_html
 
-# from langchain.docstore.document import Document
 from langchain_core.messages import HumanMessage
 
 UPLOAD_DIR = "uploads"
@@ -62,8 +62,6 @@ with col1:
     else:
         st.write("Selected format: " + st.session_state.file_format)
 
-    # img = st.session_state.graph.get_graph().draw_png()
-    # st.image(img)
 
     if user_input != None:
         st.session_state.user_input = user_input
@@ -78,7 +76,6 @@ with col1:
         and st.session_state.user_input != None):
 
         query = st.session_state.user_input.text
-        # "Take this pdf and this one PowerPoint presentation and write me a new blog post that emphasizes CAFB’s role as a leader in the food is medicine space. Ask me for the template of the new grant proposal and draft answers to all the questions using the source material without being repetitive between questions."
         files = st.session_state.user_input.files
         state = st.session_state.graph_state
         
@@ -104,52 +101,17 @@ with col1:
 
         with st.spinner("Thinking..."):
             st.session_state.graph_state = graph.invoke(state)
-
-            # print(st.session_state.graph_state)
             st.session_state.chat_history.append(("AI", st.session_state.graph_state["messages"][-1].content))
+        
+        st.session_state.user_input = None
 
-    conversation = [{"sender": sender,  "message": message} for sender, message in st.session_state.chat_history]
-    # CSS for styling the messages
-    st.markdown("""
-        <style>
-        .chat-container {
-            max-width: 700px;
-            margin: 0 auto;
-            padding: 1rem;
-        }
-        .human {
-            background-color: #DCF8C6;
-            padding: 0.8rem;
-            border-radius: 10px;
-            margin-bottom: 0.5rem;
-            align-self: flex-end;
-            text-align: right;
-        }
-        .ai {
-            background-color: #F1F0F0;
-            padding: 0.8rem;
-            border-radius: 10px;
-            margin-bottom: 0.5rem;
-            align-self: flex-start;
-            text-align: left;
-        }
-        .message-block {
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 1rem;
-        }
-        </style>
-    """, unsafe_allow_html = True)
-
-    # Conversation container
-    st.markdown('<div class="chat-container">', unsafe_allow_html = True)
-    for msg in conversation:
-        css_class = "human" if msg["sender"].lower() == "human" else "ai"
-        st.markdown(f'<div class="message-block"><div class="{css_class}">{msg["message"]}</div></div>', unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
+    conversation = [{"role": sender,  "message": message} for sender, message in st.session_state.chat_history]
+    with st.container(height = 400, border = len(conversation)):
+        for content in conversation:
+            with st.chat_message(content["role"]):
+                st.markdown(content["message"])
 
 with col2:
-    # st.header("")
     st.markdown("""
     <style>
         .stTextInput>div>textarea {
@@ -191,9 +153,11 @@ with col2:
         
         file_format = st.session_state.file_format
         if file_format in ["Blog Post"]:
-            filename = f"content.txt"
-            buffer.write(processed_content.encode())
-            mime = "text/plain"
+            processed_content = json_to_blog_html(doc_content)
+            filename = f"blog_post.html"
+            buffer.write(processed_content.encode("utf-8"))
+            # mime = "text/plain"
+            mime = "text/html"
 
         elif file_format in ["Word Document"]:
             filename = f"content.docx"

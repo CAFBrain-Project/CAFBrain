@@ -78,33 +78,3 @@ def analyze_documents(state: State):
     state["extracted_content_details"] = extracted_content_details
 
     return state
-
-# def analyze_documents(state: State):
-#     extracted_content_details = state.get('extracted_content_details', [])
-#     extraction_types = ["Key Points", "Quotes", "Statistics", "Themes",                                                                  # Core
-#                     # "Program Impacts", "Client Stories", "Funding Requirements", "Barriers Identified", "Food Medicine Leadership"       # Optional
-#                 ]
-
-#     processed_doc_count = state.get("processed_doc_count", 0)
-#     for text in state["extracted_texts"][processed_doc_count : ]:
-#         content_details = dict()
-
-#         for extraction_type in extraction_types:
-#             category_prompt = EXTRACTION_CATEGORY_TEMPLATES.get(extraction_type, DEFAULT_EXTRACTION_TEMPLATE.replace("{extraction_type}", extraction_type))
-#             prompt = ChatPromptTemplate.from_template(CAFB_TEMPLATE + category_prompt)
-    
-#             chain = (
-#                 prompt
-#                 | document_analyzer
-#                 | StrOutputParser()
-#             )
-    
-#             content_details[extraction_type] = chain.invoke({"text": text})
-    
-#         extracted_content_details.append(content_details)
-
-#     print("Analyzed Documents")
-
-#     state["extracted_content_details"] = extracted_content_details
-
-#     return state
