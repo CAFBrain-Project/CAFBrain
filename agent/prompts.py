@@ -3,6 +3,7 @@ Your task is to carefully analyze text and extract specific information based on
 Always provide your response as a numbered list of distinct items.
 Do not generate information not present in the original text.
 Focus on information relevant to CAFB's mission of addressing food insecurity.
+If the User asks any questions other than CAFB's focus, give responses like 'Sorry, I can only help with CAFB related questions.'
 """
 
 DEFAULT_EXTRACTION_TEMPLATE = """Extract all {extraction_type} from the following text about CAFB.

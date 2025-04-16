@@ -1,11 +1,12 @@
 import os
+import json
 import streamlit as st
 from io import BytesIO
 from dotenv import load_dotenv
 
 from agent.graph import graph
 from agent.state import State
-from agent.utils import json_to_blog_html
+from agent.utils import json_to_blog_html, json_to_presentation, json_to_pdf
 
 from langchain_core.messages import HumanMessage
 
@@ -50,7 +51,7 @@ if "graph_state" not in st.session_state:
 col1, col2 = st.columns([1, 1])
 
 with col1:
-    st.header("💬 Assistant Chat")
+    st.header("💬 CAFBrain Assistant")
 
     user_input = st.chat_input(placeholder = "Your message", accept_file = "multiple", file_type = ["jpg", "png", "pdf", "txt", "pptx"])
 
@@ -146,6 +147,8 @@ with col2:
     doc_content = st.text_area(label = "📝 Document Editor", value = value, height = 500, key = "editor")
 
     download_placeholder = st.empty()
+    mime = ""
+
     if st.button("🔧 Prepare Download"):
         processed_content = process_content(doc_content)
 
@@ -156,8 +159,11 @@ with col2:
             processed_content = json_to_blog_html(doc_content)
             filename = f"blog_post.html"
             buffer.write(processed_content.encode("utf-8"))
+            # Move to beginning of buffer
+            buffer.seek(0)  
             # mime = "text/plain"
             mime = "text/html"
+
 
         elif file_format in ["Word Document"]:
             filename = f"content.docx"
@@ -168,36 +174,26 @@ with col2:
 
         elif file_format in ["Grant Proposal"]:
             filename = f"content.pdf"
-            # pdf = FPDF()
-            # pdf.add_page()
-            # pdf.set_auto_page_break(auto=True, margin=15)
-            # pdf.set_font("Arial", size=12)
-            # for line in processed.split("\n"):
-                # pdf.multi_cell(0, 10, line)
-            # pdf.output(buffer)
+            buffer = json_to_pdf(doc_content)
             mime = "application/pdf"
 
         elif file_format in ["Presentation"]:
             filename = f"content.pptx"
-            # ppt = Presentation()
-            # slide_layout = ppt.slide_layouts[1]
-            # slide = ppt.slides.add_slide(slide_layout)
-            # title = slide.shapes.title
-            # content_box = slide.placeholders[1]
-            # title.text = "Processed Content"
-            # content_box.text = processed
-            # ppt.save(buffer)
+            buffer = json_to_presentation(doc_content)
             mime = "application/vnd.openxmlformats-officedocument.presentationml.presentation"
-
-        # Move to beginning of buffer
-        buffer.seek(0)
 
         print(mime)
 
-        # Download button
-        st.download_button(
-            label = f"📥 Download {file_format.upper()} file",
-            data = buffer,
-            file_name = filename,
-            mime = mime
+        if mime == "":
+            st.download_button(
+            label = f"Nothing to download yet",
+            data = ""
         )
+        else:
+            # Download button
+            st.download_button(
+                label = f"📥 Download {file_format.upper()} file",
+                data = buffer,
+                file_name = filename,
+                mime = mime
+            )

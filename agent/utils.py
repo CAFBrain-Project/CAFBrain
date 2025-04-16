@@ -1,5 +1,9 @@
 import os
 import json
+from pptx import Presentation
+from fpdf import FPDF
+from pptx.util import Inches
+from io import BytesIO
 
 def save_img(img, img_ext):
     if not os.path.exists("temp"):
@@ -65,3 +69,73 @@ def json_to_blog_html(json_input: str, output_file: str = "blog_post.html") -> s
     #     f.write(html_content.strip())
 
     return html_content.strip()
+
+
+def json_to_presentation(json_input: str, output_file: str = "content.pptx") -> BytesIO:
+
+    json_input = json.loads(json_input)
+    prs = Presentation()
+
+    # Define layout indexes
+    TITLE_SLIDE_LAYOUT = 0
+    TITLE_AND_CONTENT_LAYOUT = 1
+
+    for slide_data in json_input:
+        if "subtitle" in slide_data:
+            slide_layout = prs.slide_layouts[TITLE_SLIDE_LAYOUT]
+            slide = prs.slides.add_slide(slide_layout)
+            slide.shapes.title.text = slide_data["title"]
+            slide.placeholders[1].text = slide_data["subtitle"]
+        else:
+            slide_layout = prs.slide_layouts[TITLE_AND_CONTENT_LAYOUT]
+            slide = prs.slides.add_slide(slide_layout)
+            slide.shapes.title.text = slide_data["title"]
+            content = slide.placeholders[1].text_frame
+            content.clear()
+
+            for bullet in slide_data.get("bullets", []):
+                p = content.add_paragraph()
+                p.text = bullet
+                p.level = 0
+
+    # Save to in-memory buffer
+    buffer = BytesIO()
+    prs.save(buffer)
+    buffer.seek(0)
+    return buffer
+
+class ProposalPDF(FPDF):
+    def header(self):
+        self.set_font("Helvetica", "B", 12)
+        self.cell(0, 10, "Grant Proposal", ln=True, align="C")
+        self.ln(5)
+
+    def chapter_title(self, title):
+        self.set_font("Helvetica", "B", 14)
+        self.set_text_color(0)
+        self.multi_cell(0, 10, title)
+        self.ln(2)
+
+    def chapter_body(self, text):
+        self.set_font("Helvetica", "", 12)
+        self.set_text_color(50)
+        self.multi_cell(0, 8, text)
+        self.ln(4)
+
+def json_to_pdf(json_input: str) -> BytesIO:
+    data = json.loads(json_input)
+    pdf = ProposalPDF()
+    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.add_page()
+
+    for section in data:
+        heading = section.get("heading", "")
+        content = section.get("content", "")
+        pdf.chapter_title(heading)
+        pdf.chapter_body(content)
+
+    pdf_bytes = pdf.output(dest='S').encode('latin1')  # Get PDF as bytes
+    buffer = BytesIO()
+    buffer.write(pdf_bytes)
+    buffer.seek(0)
+    return buffer
