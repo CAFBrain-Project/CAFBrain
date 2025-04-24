@@ -9,7 +9,7 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.messages import AIMessage
 
 load_dotenv()
-follow_up_chat_model = ChatOpenAI(model = "gpt-4o-mini", temperature = 0, api_key = os.getenv("OPENAI_API_KEY")) # TODO: Move it to models dir
+follow_up_chat_model = ChatOpenAI(model = "gpt-4.1-nano", temperature = 0, api_key = os.getenv("OPENAI_API_KEY")) # TODO: Move it to models dir
 
 def follow_up(state: State):
     artifacts = state.get("generated_content", [])

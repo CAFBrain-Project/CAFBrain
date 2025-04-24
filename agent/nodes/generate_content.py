@@ -10,7 +10,7 @@ from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
 from langchain_core.messages import AIMessage
 
 load_dotenv()
-content_generator = ChatOpenAI(model = "gpt-4o-mini", temperature = 0, api_key = os.getenv("OPENAI_API_KEY")) # TODO: Move it to models dir
+content_generator = ChatOpenAI(model = "gpt-4.1-nano", temperature = 0, api_key = os.getenv("OPENAI_API_KEY")) # TODO: Move it to models dir
 
 def construct_generation_prompt(target_format):
     template = CONTENT_GENERATION_BASE_TEMPLATE

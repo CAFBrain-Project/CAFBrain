@@ -14,7 +14,7 @@ DEFAULT_GRANT_PROPOSAL_SPECIFICATIONS = {
         "Evaluation Plan"
     ],
     "style_guide": "Formal, evidence-based writing with emphasis on impact and outcomes",
-    "length_requirements": "5-10 pages",
+    "length_requirements": "5-10 pages or as requested by the user query",
     "special_sections": ["Capital Area Food Bank (CAFB) Leadership in Food Medicine"]
 }
 
@@ -26,7 +26,7 @@ DEFAULT_BLOG_POST_SPECIFICATIONS = {
         "Conclusion with call to action"
     ],
     "style_guide": "Conversational tone, with personal stories and quotes",
-    "length_requirements": "500-800 words",
+    "length_requirements": "500-800 words or as requested by the user query",
     "special_sections": ["Client Quotes", "Barriers to SNAP Access"]
 }
 
@@ -49,7 +49,7 @@ DEFAULT_PRESENTATION_SPECIFICATIONS = {
         "Follow the Capital Area Food Bank presentation template. Use minimal text per slide, "
         "prefer bullet points over paragraphs, and maintain consistent formatting. Include quotes, key stats, and visuals where applicable."
     ),
-    "length_requirements": "12–15 slides",
+    "length_requirements": "12-15 slides or as requested by the user query",
     "special_sections": [
         "Community Partnerships",
         "Data-Driven Impact Metrics"
@@ -84,7 +84,7 @@ CAFB_GRANT_PROPOSAL_SPECIFICATIONS = {
         },
         "visuals": "Use charts, tables, infographics with brand style (halftones, monoline, contrast rules)"
     },
-    "length_requirements": "6–10 pages (excluding appendices)",
+    "length_requirements": "6-10 pages (excluding appendices) or as requested by the user query",
     "special_sections": [
         "Capital Area Food Bank Leadership in Food Medicine",
         "Equity and Inclusion Narrative",
@@ -108,7 +108,7 @@ CAFB_BLOG_POST_SPECIFICATIONS = {
         "images": "Use authentic, bright, natural-light photography with emotional context",
         "icons": "Use monoline-style icons only"
     },
-    "length_requirements": "500–800 words",
+    "length_requirements": "500-800 words or as requested by the user query",
     "special_sections": [
         "Client Stories or Volunteer Quotes",
         "Barriers to Access or Policy Context"
@@ -142,7 +142,7 @@ CAFB_PRESENTATION_SPECIFICATIONS = {
         "logo_use": "Follow holding shape/pill for contrast, never distort or recolor logos",
         "visuals": "Use monoline icons, brand photography, charts styled with CAFB theme"
     },
-    "length_requirements": "12–15 slides",
+    "length_requirements": "12-15 slides or as requested by the user",
     "special_sections": ["Community Partnerships", "Data-Driven Impact Metrics"]
 }
 

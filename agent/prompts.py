@@ -50,7 +50,7 @@ Your task is to generate high-quality {target_format} content based on the detai
 
 Your output should be:
 - Clear, concise, and professionally written
-- Aligned with CAFB’s tone, values, and goals
+- Aligned with CAFB's tone, values, and goals
 - Structured according to the given format requirements
 
 These are the key ideas, facts, and messages that should be covered in the output. Use this content as the foundation for what you write.
@@ -68,7 +68,7 @@ Make sure the result is clear, well-organized, mission-aligned, and suitable for
 GRANT_PROPOSAL_TEMPLATE = """Content Requirements:
 - Use evidence-based, outcome-driven writing
 - Include specific metrics, local data, and strategic goals
-- Highlight CAFB’s leadership in food medicine and partnerships
+- Highlight CAFB's leadership in food medicine and partnerships
 - Use CAFB brand voice: mission-focused, inclusive, and solution-oriented
 
 ONLY respond with valid JSON using THIS EXACT STRUCTURE:
@@ -107,7 +107,8 @@ Include a clear call-to-action for the audience.
 ONLY respond with valid JSON using THIS EXACT STRUCTURE:
 ```json
 [
-    {{"title": "Slide Title", "subtitle": "Optional for first slide only"}},
+    {{"title": "Presentation Title", "subtitle": "Presentation subtitle"}},
+    {{"title": "Slide Title", "bullets": ["Point 1", "Point 2", "Point 3..."]}},
     {{"title": "Slide Title", "bullets": ["Point 1", "Point 2", "Point 3..."]}},
     ...
 ]
@@ -121,8 +122,8 @@ CURRENT_ARTIFACT_TEMPLATE = """This artifact is the one the user is currently vi
 NO_ARTIFACT_TEMPLATE = """The user has not generated an artifact yet."""
 
 ROUTE_QUERY_OPTIONS_HAS_ARTIFACTS = """
-- 'Refine': The user has requested some sort of change, or revision to the artifact, or to write a completely new artifact independent of the current artifact. Use their recent message and the currently selected artifact (if any) to determine what to do. You should ONLY select this if the user has clearly requested a change to the artifact, otherwise you should lean towards either generating a new artifact or responding to their query.
-  It is very important you do not edit the artifact unless clearly requested by the user.
+- 'Refine': The user has requested some sort of change, or revision to the artifact, or to write a completely new artifact independent of the current artifact. Use their recent message and the currently selected artifact (if any) to determine what to do. You should ONLY select this if the user has requested a change to the artifact, otherwise you should lean towards either generating a new artifact or responding to their query.
+  It is important that you do not edit the artifact unless requested by the user like can you change/modify/add/remove etc this/that/slide/content etc
 - 'Query': The user submitted a general input which does not require making an update, edit or generating a new artifact. This should ONLY be used if you are ABSOLUTELY sure the user does NOT want to make an edit, update or generate a new artifact."""
 
 ROUTE_QUERY_OPTIONS_NO_ARTIFACTS = """
@@ -139,8 +140,8 @@ You should look at this message in isolation and determine where to best route t
 Use this context about the application and its features when determining where to route to:
 <app-context>
 The name of the application is "CAFBrain". CAFBrain is a web application where users have a chat window and a canvas to display an artifact.
-Artifacts can be any sort of writing content, blog post, presentation, or grant proposal Capital Area Food Bank (CAFB). 
-Think of artifacts as content, or writing you might find on you might find on a grant proposals, grant applications, grant reports, powerPoint presentations, blog posts, website, social media posts.
+Artifacts can be any sort of writing content, blog post, presentation, or grant proposal for Capital Area Food Bank (CAFB). 
+Think of artifacts as content, or writing you might find on grant proposals, grant applications, grant reports, powerPoint presentations, blog posts, website, social media posts.
 Users only have a single artifact per conversation.
 </app-context>
 
@@ -149,7 +150,7 @@ Your options are as follows:
 {artifact_options}
 </options>
 
-If you have previously generated an artifact and the user asks a question that seems actionable, the likely choice is to take that action and rewrite the artifact.
+If you have previously generated an artifact and the user asks a question that seems actionable, the likely choice is to take that action and rewrite the artifact below.
 {current_artifact}
 
 Here are some examples on you should respond:
@@ -165,39 +166,61 @@ Route: Generate
 """
 
 REFINE_TEMPLATE = """You are an AI assistant, and the user has asked you to revise or update a previously generated artifact based on new input.
-Your goal is to produce an improved version of the artifact that:
+Your goal is to produce an refined version of the artifact that:
 - Incorporates the extracted content provided below
-- Follows the specified formatting guidelines
-- Aligns with the user’s intent as reflected in the conversation.
+- Follows the specified formatting guidelines strictly
+- Aligns with the user's intent as reflected in the conversation. ESPECIALLY THE LAST MESSAGE OF THE USER IN CONVERSATION HISTORY.
 
 Conversation History:
-This provides the context behind the user's request. Use it to understand their goals, tone preferences, and any specific feedback.
+This provides the context behind the user's request. Use it to understand their goals, tone preferences, and any specific feedback. Focus specifically on the last message below.
 <conversation>
 {conversation}
 </conversation>
 
 Current Artifact (to be updated):
-This is the original version of the content that needs to be revised.
+This is the original version of the generated content that needs to be revised. (MOST IMPORTANT)
 <artifact>
 {artifact_content}
 </artifact>
 
 Extracted Content (What to include):
-Key points, facts, or ideas that must be included in the updated version.
+Key points, facts, or ideas that can be included in the updated version.
 {extracted_content_details}
-
-Format Specifications (How to structure it):
-Formatting rules and style/tone guidelines the new version must follow.
-{format_specifications}
 
 Target Format (Output type):
 This is the type of content to generate. Please ensure the final output aligns with this format (e.g., PowerPoint, grant proposal, blog post, etc.).
+<target_format>
 {target_format}
+</target_format>
 
-Now, rewrite the artifact based on the above information. Make sure it is well-structured, mission-aligned, and professionally written for the Capital Area Food Bank.
+Now, refine the artifact content based on the above information. Make sure it is properly-structured according to `<format_specifications>`, mission-aligned, and professionally written for the Capital Area Food Bank.
 
-Only return the final, rewritten artifact. Do not include explanations or any additional commentary.
+Only return the final, rewritten artifact adhering to the <format_specifications> and the user's last message in <conversation>. Do not include explanations or any additional commentary.
+
+Now refine the artifact accordingly.
+
+ONLY respond with valid JSON using THIS EXACT STRUCTURE:
+Format Specifications (How to structure it):
+Formatting rules and style/tone guidelines the new version must follow. (DO NOT FORGET TO FOLLOW THE BELOW FORMAT STRICTLY)
+<format_specifications>
+{format_specifications}
+</format_specifications>
+Make sure you follow the user's refinement request to modify the <artifact> accordingly:
+{last_message}
+Start refining now.
 """
+
+# REFINE_TEMPLATE_EMERGENCY = """
+# <conversation>
+# {conversation}
+# </conversation>
+
+# <artifact>
+# {artifact_content}
+# </artifact>
+
+# FOCUS ON WHAT THE USER HAS REQUESTED AT THE LAST MESSAGE IN <conversation></conversation> AND MODIFY CONTENT ACCORDINGLY IN <artifact></artifact> AND FOLLOW THE FORMAT IN ARTIFACT OR USER'S LAST MESSAGE, DON'T DEVIATE. DON'T INCLUDE tags like these <artifact> </artifact> in your generated content
+# """
 
 QUERY_TEMPLATE = """You are an AI assistant, and the user has asked a question or made a request. 
 To answer effectively, you should retrieve relevant information from the knowledge base and combine it with your reasoning to generate a useful and accurate response.
@@ -221,12 +244,27 @@ This is the user's question or request that you need to respond to.
 
 Relevant Extracted Information:
 Here is the information you have retrieved from the knowledge base that is most relevant to answering the query.
+<retrieved_content>
 {retrieved_content}
+</retrieved_content>
+
+Generated Content:
+This is the generated content that you can refer to based on user's query.
+<artifact>
+{artifact}
+</artifact>
 
 Response:
-Now, generate a coherent, informative response based on the retrieved content and your reasoning. Ensure that the answer is clear and directly addresses the user's query.
+Now, generate a coherent, informative response based on the artifact, retrieved content(if needed), conversation and your reasoning. Ensure that the answer is clear and directly addresses the user's query.
 
 Only return the final response. Do not include explanations or any additional commentary.
+
+Here are some instructions on you can respond:
+<query>
+How many slides are there in the output you gave?
+</query>
+Response:
+There are (number of elements in the output in <artifact></artifact> for example, use code if you want internally) many slides, do you want me to add additional slides or remove some?
 """
 
 

@@ -4,13 +4,13 @@ from agent.format_specifications import FORMAT_SPECIFICATIONS, DEFAULT_FORMAT_SP
 
 import os
 from dotenv import load_dotenv
-from langchain_openai import ChatOpenAI
+# from langchain_openai import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.messages import AIMessage
 
 # load_dotenv()
-# query_analysis_model = ChatOpenAI(model = "gpt-4o-mini", temperature = 0, api_key = os.getenv("OPENAI_API_KEY")) # TODO: Move it to models dir
+# query_analysis_model = ChatOpenAI(model = "gpt-4.1-nano", temperature = 0, api_key = os.getenv("OPENAI_API_KEY")) # TODO: Move it to models dir
 
 def determine_format_specifications(state: State):
     target_format = state["target_format"]

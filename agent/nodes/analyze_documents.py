@@ -10,7 +10,7 @@ from langchain.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
 load_dotenv()
-document_analyzer = ChatOpenAI(model = "gpt-3.5-turbo", temperature = 0, api_key = os.getenv("OPENAI_API_KEY")) # TODO: Move it to models dir
+document_analyzer = ChatOpenAI(model = "gpt-4.1-mini", temperature = 0, api_key = os.getenv("OPENAI_API_KEY")) # TODO: Move it to models dir
 
 cache_dir = "../cache"
 memory = Memory(cache_dir, verbose=0)

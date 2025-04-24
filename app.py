@@ -25,7 +25,7 @@ def process_content(document):
 # Toggle-able Sidebar
 # with st.expander("⚙️ Settings", expanded = False):
 #     # openai.api_key = st.text_input("🔑 OpenAI API Key", type="password")
-#     model = st.selectbox("🧠 Model", ["gpt-3.5-turbo", "gpt-4"])
+#     model = st.selectbox("🧠 Model", ["gpt-4.1-mini", "gpt-4"])
 #     temperature = st.slider("🌡️ Temperature", 0.0, 1.0, 0.7)
 
 if "chat_history" not in st.session_state:

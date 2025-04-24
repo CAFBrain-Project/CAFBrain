@@ -4,6 +4,8 @@ from pptx import Presentation
 from fpdf import FPDF
 from pptx.util import Inches
 from io import BytesIO
+from unidecode import unidecode
+
 
 def save_img(img, img_ext):
     if not os.path.exists("temp"):
@@ -129,8 +131,8 @@ def json_to_pdf(json_input: str) -> BytesIO:
     pdf.add_page()
 
     for section in data:
-        heading = section.get("heading", "")
-        content = section.get("content", "")
+        heading = unidecode(section.get("heading", ""))
+        content = unidecode(section.get("content", ""))
         pdf.chapter_title(heading)
         pdf.chapter_body(content)
 

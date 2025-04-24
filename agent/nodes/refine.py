@@ -1,5 +1,5 @@
 from agent.state import State
-from agent.prompts import REFINE_TEMPLATE, CURRENT_ARTIFACT_TEMPLATE
+from agent.prompts import REFINE_TEMPLATE, CURRENT_ARTIFACT_TEMPLATE, GRANT_PROPOSAL_TEMPLATE, BLOG_POST_TEMPLATE, PRESENTATION_TEMPLATE
 
 import os
 from dotenv import load_dotenv
@@ -9,7 +9,7 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.messages import AIMessage
 
 load_dotenv()
-refine_model = ChatOpenAI(model = "gpt-4o-mini", temperature = 0, api_key = os.getenv("OPENAI_API_KEY")) # TODO: Move it to models dir
+refine_model = ChatOpenAI(model = "gpt-4.1-nano", temperature = 0, api_key = os.getenv("OPENAI_API_KEY")) # TODO: Move it to models dir
 
 def refine(state: State):
     conversation = state["messages"]
@@ -23,8 +23,30 @@ def refine(state: State):
     
     artifact_content = CURRENT_ARTIFACT_TEMPLATE.replace("{artifact}", artifact.content)
 
-    prompt = ChatPromptTemplate.from_template(REFINE_TEMPLATE)
+    template = REFINE_TEMPLATE
+    if target_format == "Grant Proposal":
+        template += GRANT_PROPOSAL_TEMPLATE
 
+    elif target_format == "Blog Post":
+        template += BLOG_POST_TEMPLATE
+
+    elif target_format == "Presentation":
+        template += PRESENTATION_TEMPLATE
+
+    prompt = ChatPromptTemplate.from_template(template)
+
+    injected_prompt = prompt.format(
+        extracted_content_details=extracted_content_details,
+        format_specifications=format_specifications,
+        target_format=target_format,
+        conversation=conversation,
+        artifact_content=artifact_content,
+        last_message=conversation[-1].content
+    )
+
+    print('------------------------------------------------------------------------------------------')
+    print('Here is the refinement prompt: ', injected_prompt)
+    print('------------------------------------------------------------------------------------------')
     chain = prompt | refine_model | StrOutputParser()
 
     generated_content = chain.invoke({
@@ -32,8 +54,13 @@ def refine(state: State):
         "artifact_content": artifact_content,
         "extracted_content_details": extracted_content_details,
         "format_specifications": format_specifications,
-        "target_format": target_format
+        "target_format": target_format,
+        "last_message": conversation[-1].content
     })
+
+    print('------------------------------------------------------------------------------------------')
+    print('Here is the refinement prompt output: ', generated_content)
+    print('------------------------------------------------------------------------------------------')
 
     state["generated_content"] = state.get("generated_content", []) + [AIMessage(content = generated_content)]
 

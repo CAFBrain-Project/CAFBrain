@@ -9,7 +9,7 @@ from langchain_core.output_parsers import StrOutputParser
 
 load_dotenv()
 # gpt-4o
-router_model = ChatOpenAI(model = "gpt-4o-mini", temperature = 0, api_key = os.getenv("OPENAI_API_KEY")) # TODO: Move it to models dir
+router_model = ChatOpenAI(model = "gpt-4.1-nano", temperature = 0, api_key = os.getenv("OPENAI_API_KEY")) # TODO: Move it to models dir
 
 def router(state: State):
     messages = state.get("messages", [])
