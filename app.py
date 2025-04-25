@@ -17,7 +17,7 @@ load_dotenv()
 # openai_key = st.secrets["GROQ_API_KEY"] if "GROQ_API_KEY" in st.secrets else os.getenv("GROQ_API_KEY")
 # hf_token = st.secrets["HF_TOKEN"] if "HF_TOKEN" in st.secrets else os.getenv("HF_TOKEN")
 
-st.set_page_config(layout = "wide", page_title = "CAFBrain 🧠")
+st.set_page_config(layout = "wide", page_title = "CAFBrain")
 
 def process_content(document):
     return document    
